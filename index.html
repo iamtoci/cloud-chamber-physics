@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f4ef" />
+    <meta name="description" content="An interactive cloud chamber for IGCSE physics: observe particle tracks and learn how vapour makes radiation visible." />
+    <title>Cloud Chamber — an interactive physics lab</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="Cloud Chamber home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>cloud<span class="brand-light">chamber</span><small>INTERACTIVE PHYSICS LAB</small></span>
+        </a>
+        <span class="header-tag">Made for IGCSE · Curious IB minds welcome</span>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div class="eyebrow"><span class="eyebrow-line"></span> OBSERVE THE UNSEEN <span class="eyebrow-dot">✳</span> 01 / 01</div>
+          <div class="intro-row">
+            <div>
+              <h1 id="page-title">See the <em>invisible.</em></h1>
+              <p>Charged particles leave clues as they pass through a cloud chamber. Watch the trails, compare their shapes, and work out what the vapour is showing you.</p>
+            </div>
+            <div class="intro-aside"><span class="aside-icon" aria-hidden="true">↗</span><span>A small experiment in<br />a big idea.</span></div>
+          </div>
+        </section>
+
+        <section class="lab" aria-label="Interactive cloud chamber simulation">
+          <div class="chamber-column">
+            <div class="stage-heading">
+              <div><span class="section-number">01</span><h2>The chamber</h2></div>
+              <span class="stage-status"><span class="status-dot"></span><span id="status-text">SIMULATION RUNNING</span></span>
+            </div>
+            <div class="chamber-frame" id="chamber-frame">
+              <canvas id="chamber" aria-label="Animated simulation of particle tracks in a cloud chamber"></canvas>
+              <div class="chamber-topline"><span class="chamber-label">TOP VIEW <span class="tiny-separator">/</span> SUPERSATURATED VAPOUR</span><span class="chamber-cross" aria-hidden="true">＋</span></div>
+              <div class="chamber-bottomline"><span>COOLED BASE</span><span>SIMULATED PARTICLE TRACKS</span></div>
+              <div class="empty-state" id="empty-state" hidden>Switch on a particle source to see tracks.</div>
+            </div>
+            <div class="stage-footer">
+              <div class="legend" aria-label="Track legend"><span><i class="legend-line alpha"></i> Alpha</span><span><i class="legend-line beta"></i> Beta</span><span><i class="legend-line muon"></i> Cosmic muon</span></div>
+              <span class="canvas-hint">Click a trail to inspect it <span aria-hidden="true">↖</span></span>
+            </div>
+          </div>
+
+          <aside class="controls" aria-label="Simulation controls">
+            <div class="controls-title"><span class="section-number">02</span><h2>Set the scene</h2><span class="control-symbol" aria-hidden="true">✳</span></div>
+            <p class="controls-intro">Choose which particles can pass through, then observe the trails they leave.</p>
+            <div class="control-group">
+              <div class="group-heading"><span>PARTICLE SOURCES</span><span>ON / OFF</span></div>
+              <label class="source-row"><span class="particle-symbol alpha-symbol">α</span><span class="source-copy"><strong>Alpha</strong><small>Heavy, charged particle</small></span><input type="checkbox" id="source-alpha" checked /><span class="switch" aria-hidden="true"></span></label>
+              <label class="source-row"><span class="particle-symbol beta-symbol">β</span><span class="source-copy"><strong>Beta</strong><small>Fast electron</small></span><input type="checkbox" id="source-beta" checked /><span class="switch" aria-hidden="true"></span></label>
+              <label class="source-row"><span class="particle-symbol muon-symbol">μ</span><span class="source-copy"><strong>Cosmic muon</strong><small>From cosmic rays</small></span><input type="checkbox" id="source-muon" checked /><span class="switch" aria-hidden="true"></span></label>
+            </div>
+            <div class="control-group pace-group">
+              <div class="group-heading"><label for="pace">SIMULATION PACE</label><output id="pace-value" for="pace">Steady</output></div>
+              <input id="pace" type="range" min="1" max="3" value="2" step="1" />
+              <div class="range-labels"><span>Slow</span><span>Steady</span><span>Busy</span></div>
+              <p class="pace-note">Changes how often this simulation shows events.</p>
+            </div>
+            <div class="control-actions"><button id="pause-button" class="primary-button" type="button"><span id="pause-icon" aria-hidden="true">Ⅱ</span><span id="pause-label">Pause</span></button><button id="clear-button" class="secondary-button" type="button">Clear trails <span aria-hidden="true">↺</span></button></div>
+          </aside>
+        </section>
+
+        <section class="learning-row" aria-label="Track observation and explanation">
+          <div class="observation-card" id="observation-card">
+            <div class="card-kicker"><span class="kicker-icon">◉</span> TRACK INSPECTOR <span class="kicker-index">01 — 03</span></div>
+            <div id="inspector-idle"><h2>What do you notice?</h2><p>Select a trail in the chamber. Its length, thickness and shape are clues to the particle that made it.</p><div class="inspector-prompt"><span>TRY THIS</span> Find a short, thick trail. What could it be?</div></div>
+            <div id="inspector-active" hidden><div class="inspector-heading"><span id="inspector-glyph">α</span><div><h2 id="inspector-title">A dense, short trail</h2><p id="inspector-clue"></p></div></div><div class="identity-line"><span>LIKELY PARTICLE</span><strong id="inspector-particle"></strong></div><p class="inspector-caveat">Track shape is evidence, not a certain identification.</p></div>
+          </div>
+          <div class="concept-card">
+            <div class="card-kicker"><span class="kicker-icon">✳</span> THE KEY IDEA <span class="kicker-index">IN THREE STEPS</span></div>
+            <h2>Why does a trail appear?</h2>
+            <ol class="mechanism"><li><span>01</span><p>A charged particle passes through the vapour.</p></li><li><span>02</span><p>It ionises molecules along its path.</p></li><li><span>03</span><p>Vapour condenses on the ions as tiny droplets: a visible trail.</p></li></ol>
+          </div>
+        </section>
+
+        <section class="takeaway" aria-label="Important distinction"><span class="takeaway-mark">!</span><p><strong>One important distinction:</strong> gamma rays have no charge, so they do not make a direct condensation trail. They can sometimes produce a visible secondary electron.</p><span class="takeaway-end" aria-hidden="true">↗</span></section>
+      </main>
+      <footer><span>Cloud Chamber <span class="footer-dot">✳</span> An interactive learning simulation</span><span>Based on <a href="https://scoollab.web.cern.ch/sites/default/files/documents/20200521_JW_DIYManual_CloudChamber_v7.pdf" target="_blank" rel="noopener noreferrer">CERN’s cloud chamber guide</a></span></footer>
+    </div>
+  </body>
+</html>
