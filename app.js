@@ -22,11 +22,20 @@
   const inspectorTitle = document.getElementById('inspector-title');
   const inspectorClue = document.getElementById('inspector-clue');
   const inspectorParticle = document.getElementById('inspector-particle');
+  const css = getComputedStyle(document.documentElement);
+  const theme = {
+    alpha: css.getPropertyValue('--track-alpha').trim(),
+    beta: css.getPropertyValue('--track-beta').trim(),
+    muon: css.getPropertyValue('--track-muon').trim(),
+    chamber: css.getPropertyValue('--chamber-bg').trim(),
+    grid: css.getPropertyValue('--chamber-grid').trim(),
+    mist: css.getPropertyValue('--cyan').trim(),
+  };
 
   const descriptions = {
-    alpha: { glyph: 'α', title: 'A dense, short trail', clue: 'Many droplets sit close together. Alpha particles ionise strongly but travel only a short distance in air.', particle: 'Alpha particle', color: '#e9be9c' },
-    beta: { glyph: 'β', title: 'A fine, wandering trail', clue: 'This thinner trail can bend or scatter. A beta particle is an electron and usually ionises less densely than an alpha particle.', particle: 'Beta particle (electron)', color: '#d4eacc' },
-    muon: { glyph: 'μ', title: 'A long, fine trail', clue: 'A cosmic muon often passes right across the chamber, leaving a nearly straight, thin trail.', particle: 'Cosmic muon', color: '#9cddc7' },
+    alpha: { glyph: 'α', title: 'A dense, short trail', clue: 'Many droplets sit close together. Alpha particles ionise strongly but travel only a short distance in air.', particle: 'Alpha particle', color: theme.alpha },
+    beta: { glyph: 'β', title: 'A fine, wandering trail', clue: 'This thinner trail can bend or scatter. A beta particle is an electron and usually ionises less densely than an alpha particle.', particle: 'Beta particle (electron)', color: theme.beta },
+    muon: { glyph: 'μ', title: 'A long, fine trail', clue: 'A cosmic muon often passes right across the chamber, leaving a nearly straight, thin trail.', particle: 'Cosmic muon', color: theme.muon },
   };
 
   let width = 1;
@@ -94,27 +103,21 @@
   }
 
   function drawBackground() {
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#183e3a');
-    gradient.addColorStop(.45, '#0c2829');
-    gradient.addColorStop(1, '#173832');
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = theme.chamber;
     ctx.fillRect(0, 0, width, height);
-    const halo = ctx.createRadialGradient(width * .48, height * .45, 0, width * .48, height * .45, width * .72);
-    halo.addColorStop(0, 'rgba(105,157,131,.17)');
-    halo.addColorStop(1, 'rgba(6,24,26,.35)');
-    ctx.fillStyle = halo;
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = theme.mist;
     for (const speckle of speckles) {
       ctx.beginPath();
-      ctx.fillStyle = `rgba(190,225,197,${speckle.a})`;
+      ctx.globalAlpha = speckle.a;
       ctx.arc(speckle.x, speckle.y, speckle.r, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.strokeStyle = 'rgba(154,205,178,.065)';
+    ctx.globalAlpha = .28;
+    ctx.strokeStyle = theme.grid;
     ctx.lineWidth = 1;
     for (let x = 70; x < width; x += 76) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
     for (let y = 72; y < height; y += 76) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
+    ctx.globalAlpha = 1;
   }
 
   function pointPx(point) { return { x: point.x * width, y: point.y * height }; }
@@ -185,8 +188,7 @@
     selectedId = track.id;
     const info = descriptions[track.type];
     inspectorGlyph.textContent = info.glyph;
-    inspectorGlyph.style.background = track.type === 'alpha' ? '#f4e7dc' : track.type === 'beta' ? '#ecf3e4' : '#e6f2ee';
-    inspectorGlyph.style.color = track.type === 'alpha' ? '#b98564' : track.type === 'beta' ? '#7a9b63' : '#5d9e8b';
+    inspectorGlyph.className = `${track.type}-visual`;
     inspectorTitle.textContent = info.title;
     inspectorClue.textContent = info.clue;
     inspectorParticle.textContent = info.particle;
