@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f4ef" />
-    <meta name="description" content="An interactive cloud chamber for IGCSE physics: observe particle tracks and learn how vapour makes radiation visible." />
+    <meta name="theme-color" content="#F2F0E8" />
+    <meta name="description" content="Explore Cambridge IGCSE radioactivity through cloud-chamber observations, a virtual counter and original practice questions." />
     <title>Cloud Chamber — an interactive physics lab</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
+    <script src="/content.js" defer></script>
     <script src="/app.js" defer></script>
+    <script src="/practice.js" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -39,13 +41,13 @@
               <span class="stage-status"><span class="status-dot"></span><span id="status-text">SIMULATION RUNNING</span></span>
             </div>
             <div class="chamber-frame" id="chamber-frame">
-              <canvas id="chamber" aria-label="Animated simulation of particle tracks in a cloud chamber"></canvas>
-              <div class="chamber-topline"><span class="chamber-label">TOP VIEW <span class="tiny-separator">/</span> SUPERSATURATED VAPOUR</span><span class="chamber-cross" aria-hidden="true">＋</span></div>
-              <div class="chamber-bottomline"><span>COOLED BASE</span><span>SIMULATED PARTICLE TRACKS</span></div>
+              <canvas id="chamber" tabindex="0" role="button" aria-label="Inspect a visible particle trail. Press Enter to cycle through trails."></canvas>
+              <div class="chamber-topline"><span class="chamber-label">TOP VIEW <span class="tiny-separator">/</span> PARTICLE TRAILS</span><span class="chamber-cross" aria-hidden="true">＋</span></div>
+              <div class="chamber-bottomline"><span>CHAMBER BASE</span><span>SIMULATED OBSERVATIONS</span></div>
               <div class="empty-state" id="empty-state" hidden>Switch on a particle source to see tracks.</div>
             </div>
             <div class="stage-footer">
-              <div class="legend" aria-label="Track legend"><span><i class="legend-line alpha"></i> Alpha</span><span><i class="legend-line beta"></i> Beta</span><span><i class="legend-line muon"></i> Cosmic muon</span></div>
+              <div class="legend" aria-label="Track legend"><span><i class="legend-line alpha"></i> Alpha</span><span><i class="legend-line beta"></i> Beta</span><span id="muon-legend" hidden><i class="legend-line muon"></i> Cosmic muon</span></div>
               <span class="canvas-hint">Click a trail to inspect it <span aria-hidden="true">↖</span></span>
             </div>
           </div>
@@ -57,7 +59,7 @@
               <div class="group-heading"><span>PARTICLE SOURCES</span><span>ON / OFF</span></div>
               <label class="source-row"><span class="particle-symbol alpha-symbol">α</span><span class="source-copy"><strong>Alpha</strong><small>Heavy, charged particle</small></span><input type="checkbox" id="source-alpha" checked /><span class="switch" aria-hidden="true"></span></label>
               <label class="source-row"><span class="particle-symbol beta-symbol">β</span><span class="source-copy"><strong>Beta</strong><small>Fast electron</small></span><input type="checkbox" id="source-beta" checked /><span class="switch" aria-hidden="true"></span></label>
-              <label class="source-row"><span class="particle-symbol muon-symbol">μ</span><span class="source-copy"><strong>Cosmic muon</strong><small>From cosmic rays</small></span><input type="checkbox" id="source-muon" checked /><span class="switch" aria-hidden="true"></span></label>
+              <details id="muon-more" class="more-inline"><summary>MORE ▸ <span>Cosmic-ray trails</span></summary><label class="source-row"><span class="particle-symbol muon-symbol">μ</span><span class="source-copy"><strong>Cosmic muon</strong><small>From cosmic rays</small></span><input type="checkbox" id="source-muon" /><span class="switch" aria-hidden="true"></span></label><p>A long, fine trail may come from a cosmic muon. Track shape alone is not proof.</p></details>
             </div>
             <div class="control-group pace-group">
               <div class="group-heading"><label for="pace">SIMULATION PACE</label><output id="pace-value" for="pace">Steady</output></div>
@@ -76,15 +78,34 @@
             <div id="inspector-active" hidden><div class="inspector-heading"><span id="inspector-glyph">α</span><div><h2 id="inspector-title">A dense, short trail</h2><p id="inspector-clue"></p></div></div><div class="identity-line"><span>LIKELY PARTICLE</span><strong id="inspector-particle"></strong></div><p class="inspector-caveat">Track shape is evidence, not a certain identification.</p></div>
           </div>
           <div class="concept-card">
-            <div class="card-kicker"><span class="kicker-icon">✳</span> THE KEY IDEA <span class="kicker-index">IN THREE STEPS</span></div>
-            <h2>Why does a trail appear?</h2>
-            <ol class="mechanism"><li><span>01</span><p>A charged particle passes through the vapour.</p></li><li><span>02</span><p>It ionises molecules along its path.</p></li><li><span>03</span><p>Vapour condenses on the ions as tiny droplets: a visible trail.</p></li></ol>
+            <div class="card-kicker"><span class="kicker-icon">✳</span> THE KEY IDEA <span class="kicker-index">IONISING RADIATION</span></div>
+            <h2>What does the trail tell us?</h2>
+            <ol class="mechanism"><li><span>01</span><p>Charged radiation can ionise atoms or molecules.</p></li><li><span>02</span><p>The chamber makes effects of that ionisation visible.</p></li><li><span>03</span><p>A dense, short trail is evidence of strong ionisation, not certain identification.</p></li></ol>
+            <button id="mechanism-more" class="more-trigger" type="button" aria-expanded="false" aria-controls="mechanism-more-panel" aria-label="More about how cloud chamber droplets form">MORE ▸</button>
+            <div id="mechanism-more-panel" class="more-panel" hidden></div>
           </div>
         </section>
 
         <section class="takeaway" aria-label="Important distinction"><span class="takeaway-mark">!</span><p><strong>One important distinction:</strong> gamma rays have no charge, so they do not make a direct condensation trail. They can sometimes produce a visible secondary electron.</p><span class="takeaway-end" aria-hidden="true">↗</span></section>
+
+        <section class="pathway" id="pathway" aria-labelledby="pathway-title">
+          <div class="learning-heading"><span class="section-number">03</span><div><h2 id="pathway-title">Follow the evidence</h2><p>Seven short discoveries · Cambridge IGCSE 0625 core pathway</p></div><output id="core-progress" aria-live="polite">0 / 7</output></div>
+          <div id="step-tabs" class="step-tabs" role="tablist" aria-label="Core learning steps"></div>
+          <div id="step-panel" class="step-panel" role="tabpanel" tabindex="0" aria-live="polite">
+            <div class="step-copy"><span id="step-index" class="instrument-label">01 / 07</span><h3 id="step-heading"></h3><p id="step-summary"></p></div>
+            <div id="step-interaction" class="step-interaction"></div>
+            <div class="step-more"><button id="step-more-button" class="more-trigger" type="button" aria-expanded="false" aria-controls="step-more-panel">MORE ▸</button><div id="step-more-panel" class="more-panel" hidden></div></div>
+          </div>
+        </section>
+
+        <section class="practice" id="practice" aria-labelledby="practice-title">
+          <div class="learning-heading"><span class="section-number">04</span><div><h2 id="practice-title">Practice questions</h2><p>A small mixed set, one question at a time · original questions</p></div><span id="practice-count" class="instrument-label">QUESTION 1 / 5</span></div>
+          <div class="practice-tools"><label for="practice-band">QUESTION SET</label><select id="practice-band"><option value="core">IGCSE Core</option><option value="extended">IGCSE Core + Extended</option><option value="more">MORE · IB bridge and curious physics</option></select><label for="practice-objective">TOPIC</label><select id="practice-objective"><option value="all">All topics</option></select><button id="new-practice-set" type="button" class="secondary-button">[ NEW MIXED SET ]</button></div>
+          <div id="practice-question" class="practice-question"></div>
+          <div class="practice-footer"><button id="practice-prev" type="button" class="secondary-button">← PREVIOUS</button><span id="practice-position" class="instrument-label" aria-live="polite">1 / 5</span><button id="practice-next" type="button" class="primary-button">NEXT ▸</button></div>
+        </section>
       </main>
-      <footer><span>Cloud Chamber <span class="footer-dot">✳</span> An interactive learning simulation</span><span>Based on <a href="https://scoollab.web.cern.ch/sites/default/files/documents/20200521_JW_DIYManual_CloudChamber_v7.pdf" target="_blank" rel="noopener noreferrer">CERN’s cloud chamber guide</a></span></footer>
+      <footer><span>Cloud Chamber <span class="footer-dot">✳</span> An interactive learning simulation</span><span>Curriculum: <a href="https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf" target="_blank" rel="noopener noreferrer">Cambridge 0625</a> · Extensions: <a href="https://www.ibo.org/globalassets/new-structure/university-admission/pdfs/subject-guides/physics-guide.pdf" target="_blank" rel="noopener noreferrer">IB Physics</a> · Chamber: <a href="https://scoollab.web.cern.ch/sites/default/files/documents/20200521_JW_DIYManual_CloudChamber_v7.pdf" target="_blank" rel="noopener noreferrer">CERN</a></span></footer>
     </div>
   </body>
 </html>

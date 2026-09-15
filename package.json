@@ -1,1 +1,1 @@
-{"name":"cloud-chamber","version":"1.0.0","private":true,"scripts":{"dev":"python3 -m http.server 3000","check":"node --check app.js"}}
+{"name":"cloud-chamber","version":"1.1.0","private":true,"scripts":{"dev":"python3 -m http.server 3000","check":"node --check app.js && node --check content.js && node --check practice.js && node tools/audit_content.js"}}
